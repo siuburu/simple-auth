@@ -1,8 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 const app = express();
-app.listen(3000, () => console.log("Server is running"));
-
+const port = 3000;
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+/*
 mongoose.connect(
 	"mongodb+srv://root:root@theverybestapp.rm6mwue.mongodb.net/test"
 );
@@ -36,3 +39,20 @@ app.get("/", async (req, res) => {
 		console.log(err);
 	}
 });
+*/
+//Homepage Route
+app.get("/", (req, res) => {
+	res.sendFile(__dirname + "/static/index.html");
+});
+//Login Route
+app.get("/login.html", (req, res) => {
+	res.sendFile(__dirname + "/static/login.html");
+});
+
+app.post("/login.html", (req, res) => {
+	let username = req.body.username;
+	let password = req.body.password;
+	res.send(`Username: ${username} Password: ${password}`);
+});
+
+app.listen(port, () => console.log(`App is listening port ${port}`));
