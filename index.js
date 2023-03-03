@@ -22,24 +22,16 @@ app.get("/", (req, res) => {
 	res.sendFile(__dirname + "/static/index.html");
 });
 //Login Route
-app.get("/login.html", (req, res) => {
+app.get("/login", (req, res) => {
 	res.sendFile(__dirname + "/static/login.html");
 });
-
-const User = mongoose.model("User", userSchema);
-/*
-const user = new User({
-	username: "demo",
-	email: "demo@demo.com",
-	password: "demo",
-	role: "admin",
+app.get("/new_user", (req, res) => {
+	res.sendFile(__dirname + "/static/new_user.html");
 });
-user.save().then(
-	() => console.log("Usuário Cadastrado"),
-	(err) => console.log(err)
-);
-*/
-app.post("/login.html", async (req, res) => {
+const User = mongoose.model("User", userSchema);
+
+//post da pagina de login
+app.post("/login", async (req, res) => {
 	try {
 		const data = req.body;
 		const { username, password } = data;
@@ -47,18 +39,28 @@ app.post("/login.html", async (req, res) => {
 			username: username,
 			password: password,
 		});
-		res.send(users);
-		console.log(users.role);
+
+		//se user for adm manda pra pag de cadastro, qualquer outro user retorna o Json do user
+		users.role == "admin" ? res.redirect("/new_user") : res.send(users);
 	} catch (err) {
 		console.log(err);
 	}
 });
 
-/*
-app.post("/login.html", (req, res) => {
-	let username = req.body.username;
-	let password = req.body.password;
-	res.send(`Username: ${username} Password: ${password}`);
+//cadastra usuário no banco
+app.post("/new_user", async (req, res) => {
+	const data = req.body;
+	const { username, password, email, role } = data;
+	const user = new User({
+		username: username,
+		email: email,
+		password: password,
+		role: role,
+	});
+	user.save().then(
+		() => console.log("Usuário cadastrado"),
+		(err) => console.log(err)
+	);
 });
-*/
+
 app.listen(port, () => console.log(`App is listening port ${port}`));
