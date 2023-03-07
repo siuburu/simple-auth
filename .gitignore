@@ -3,6 +3,8 @@
 
 ### Node ###
 # Logs
+.\node_modules
+.env
 logs
 *.log
 npm-debug.log*
