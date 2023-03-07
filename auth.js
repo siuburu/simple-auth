@@ -18,12 +18,6 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 const saltRounds = 10;
 
-const readline = require("readline");
-
-const rl = readline.createInterface({
-	input: process.stdin,
-	output: process.stdout,
-});
 //Menu inicial
 function displayMenu() {
 	console.log("Welcome to the Terminal App!");
@@ -83,34 +77,44 @@ async function listUsers() {
 	).then((res) => {
 		console.log(res);
 	});
+	displayMenu();
 }
 async function deleteUser(deleteUsername) {
-	let confirm = prompt("Are you sure you want to delete this user?");
+	let confirm = prompt("Are you sure you want to delete this user? (y/n)");
 	if (confirm === "y") {
 		await User.findOneAndDelete({
 			username: deleteUsername,
 		});
+		displayMenu();
 	} else if (confirm === "n") {
-		displaySystemMenu();
+		displayMenu();
 	}
 }
 //menu de usuário logado
 function displaySystemMenu(username) {
-	console.log(`Hello ${username} what we gonna do today?`);
+	console.log(`Hello ${username.role} what we gonna do today?`);
 	console.log("1. Enable 2FA");
 	console.log("2. Disable 2FA");
 	console.log("3. List users");
+	console.log("4. Delete User");
+	console.log("5. Exit Program");
 	choice = prompt("Enter your choice: ");
 	switch (choice) {
 		case "1":
-			enable2fa(username);
+			enable2fa(username.username);
 			break;
 		case "2":
-			disable2fa(username);
+			disable2fa(username.username);
 			break;
 		case "3":
 			listUsers();
 			break;
+		case "4":
+			let deleteUsername = prompt("Enter username that you want to delete: ");
+			deleteUser(deleteUsername);
+			break;
+		case "5":
+			process.exit(0);
 		default:
 			console.log("Invalid choice! Please try again.");
 			displaySystemMenu(username);
@@ -172,14 +176,16 @@ async function signIn() {
 
 				console.log("Welcome " + users.role);
 
-				displaySystemMenu(users.username);
+				//passa o doc do banco
+				displaySystemMenu(users);
 			} else {
 				console.clear();
 				console.log("invalid token");
 				displayMenu();
 			}
 		} else {
-			displaySystemMenu(users.username);
+			//passa o doc do banco
+			displaySystemMenu(users);
 		}
 	}
 }
